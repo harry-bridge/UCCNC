@@ -1,0 +1,18 @@
+// Switch air between high and low flow rate modes
+
+int buttonNumber = 20002;
+
+if (AS3.Getbuttonstate(buttonNumber)) {
+	// Button on so turn off
+	exec.Setoutpin(1, 17);
+	AS3.Switchbutton(false, buttonNumber);
+	Thread.Sleep(200);
+	exec.Clroutpin(1, 17);
+	
+} else {
+	// Button off so turn on
+	exec.Setoutpin(1, 16);
+	AS3.Switchbutton(true, buttonNumber);
+	Thread.Sleep(200);
+	exec.Clroutpin(1, 16);
+}

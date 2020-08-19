@@ -1,0 +1,17 @@
+// Macro Loop to reset the cycle timer
+
+int resetCounter = 0;
+
+while (loop) {
+ 	if (AS3.GetLED(54) && resetCounter == 0) {
+ 	// Call the zero cycle timer button
+ 	exec.Callbutton(218);
+  	resetCounter = 1;
+ 	} 
+ 
+ 	if (!AS3.GetLED(54)) {
+  		resetCounter = 0;
+ 	}
+
+ 	Thread.Sleep(50);
+}

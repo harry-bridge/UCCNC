@@ -1,0 +1,70 @@
+// Outline currently loaded file with the head of the laser
+
+string command = "";
+// Min and max drawing feedrates
+int drawFeedrateMax = 15000;
+int drawFeedrateMin = 1000;
+// How long to draw each side in S
+double drawTime = 0.8;
+
+int Diagnostics_minX = 885;
+int Diagnostics_maxX = 888;
+int Diagnostics_minY = 886;
+int Diagnostics_maxY = 889;
+int Diagnostics_sizeX = 891;
+int Diagnostics_sizeY = 892;
+
+// First toggle the button LED to let the user know somethings happening
+AS3.Switchbutton(true, 20003);
+
+// Get the min and max bounds from the internal variables
+double diagMinX = Convert.ToDouble(AS3.Getfield(Diagnostics_minX));
+double diagMaxX = Convert.ToDouble(AS3.Getfield(Diagnostics_maxX));
+
+double diagMinY = Convert.ToDouble(AS3.Getfield(Diagnostics_minY));
+double diagMaxY = Convert.ToDouble(AS3.Getfield(Diagnostics_maxY));
+
+double diagSizeX =  Convert.ToDouble(AS3.Getfield(Diagnostics_sizeX));
+double diagSizeY =  Convert.ToDouble(AS3.Getfield(Diagnostics_sizeY));
+
+double minX, maxX, minY, maxY;
+
+// Convert the min and max so that the drawing starts from the (0, 0) origin
+if (0 - Math.Abs(diagMinX) < 0 - Math.Abs(diagMaxX)) {
+	minX = diagMaxX;
+	maxX = diagMinX;
+} else {
+	minX = diagMinX;
+	maxX = diagMaxX;
+}
+
+if (0 - Math.Abs(diagMinY) < 0 - Math.Abs(diagMaxY)) {
+	minY = diagMaxY;
+	maxY = diagMinY;
+} else {
+	minY = diagMinY;
+	maxY = diagMaxY;
+}
+
+// Calc feedrate for X and Y so sides are always drawn in the same amount of time 
+double drawFeedrateX = Math.Max(Math.Min(((diagSizeX / drawTime) * 60), drawFeedrateMax), drawFeedrateMin);
+double drawFeedrateY = Math.Max(Math.Min(((diagSizeY / drawTime) * 60), drawFeedrateMax), drawFeedrateMin);
+
+// Move to the origin pos
+command = string.Format("G54 G90 G0 X{0:000} Y{1:000}", minX, minY);
+exec.Code(command);
+
+// Draw outline with head
+command = string.Format("G1 F{0:000} X{1:000} Y{2:000}", drawFeedrateX, maxX, minY);
+exec.Code(command);
+command = string.Format("G1 F{0:000} X{1:000} Y{2:000}", drawFeedrateY, maxX, maxY);
+exec.Code(command);
+command = string.Format("G1 F{0:000} X{1:000} Y{2:000}", drawFeedrateX, minX, maxY);
+exec.Code(command);
+command = string.Format("G1 F{0:000} X{1:000} Y{2:000}", drawFeedrateY, minX, minY);
+exec.Code(command);
+
+exec.Code("G0 X0 Y0");
+
+// Visually turn the button off
+AS3.Switchbutton(false, 20003);

@@ -1,0 +1,15 @@
+//This is the Constructor macro which executes once when the application gets loaded
+
+// Turn off the master air 
+exec.Clroutpin(1, 14);
+AS3.Switchbutton(false, 20001);
+
+// Set flow rate solenoid back to known state
+exec.Setoutpin(1, 17);
+AS3.Switchbutton(false, 20002);
+Thread.Sleep(200);
+exec.Clroutpin(1, 17);
+
+// Turn off the extractor fan
+exec.Clroutpin(1, 14);
+AS3.Switchbutton(false, 20004);

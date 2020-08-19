@@ -1,0 +1,85 @@
+// Macroloop to autostart extract and to wait for shutoff
+// How long to wait for extraction to turn off and air to go to low flow rate
+int delayAfterOffExtract = 30 * 1000;
+// How long to wait for air to shut off completely
+int delayAfterOffAir = 120 * 1000;
+int cycleHasStarted = 0;
+int cycleHasStopped = 0;
+
+// Internal variables
+int delayLoopSleepTime = 50;
+double extractDelayCount = delayAfterOffExtract / delayLoopSleepTime;
+double airDelayCount = delayAfterOffAir / delayLoopSleepTime;
+
+// Number of times we've been through delay loop
+int delayCount = 0;
+// Variable set if we're currently waiting to turn off
+int waiting = 0;
+
+while (loop) {
+	delayCount = 0;
+
+ 	if (AS3.GetLED(54) && cycleHasStarted == 0) {
+		// Cycle has started
+		cycleHasStarted = 1;
+		
+		// Extract
+		exec.Setoutpin(2, 9);
+		AS3.Switchbutton(true, 20003);
+	  
+		// Air
+		exec.Setoutpin(1, 14);
+		AS3.Switchbutton(true, 20001);
+		exec.Setoutpin(1, 16);
+		AS3.Switchbutton(true, 20002);
+		Thread.Sleep(200);
+		exec.Clroutpin(1, 16);
+  
+  
+	  
+	 } else if (!AS3.GetLED(54) && cycleHasStarted == 1) {
+		  cycleHasStopped = 1;
+		  cycleHasStarted = 0; 
+	 }
+ 	if (!AS3.GetLED(54) && cycleHasStopped == 1) {
+	  	cycleHasStopped = 0;
+	  	waiting = 1;
+
+	  	int extractOff = 0;
+	  	int airOff = 0;
+
+		while (waiting == 1) {
+			if (AS3.GetLED(54)) {
+				// Check that we haven't started a new run during the delay time
+				// if not then we can turn the fan off
+				waiting = 0;
+				break;
+			}
+
+			if (delayCount >= airDelayCount && airOff == 0) {
+				airOff = 1;
+				exec.Clroutpin(1, 14);
+				AS3.Switchbutton(false, 20001);
+			}
+
+			if (delayCount >= extractDelayCount && extractOff == 0) {
+				extractOff = 1;
+				// Turn extract off
+				exec.Clroutpin(2, 9);
+				AS3.Switchbutton(false, 20003);
+
+				// Set air to low flowrate mode	
+				exec.Setoutpin(1, 17);
+				AS3.Switchbutton(false, 20002);
+				Thread.Sleep(200);
+				exec.Clroutpin(1, 17);
+			}
+
+			delayCount ++;
+			Thread.Sleep(50);
+		}
+
+ 	} else {
+  		Thread.Sleep(50);
+ 	}
+}

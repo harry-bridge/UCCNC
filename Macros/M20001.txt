@@ -1,0 +1,14 @@
+// Turn on and off the master air solenoid
+
+int buttonNumber = 20001;
+
+if (AS3.Getbuttonstate(buttonNumber)) {
+	// Button on so turn off
+	exec.Clroutpin(1, 14);
+	AS3.Switchbutton(false, buttonNumber);
+	
+} else {
+	// Button off so turn on
+	exec.Setoutpin(1, 14);
+	AS3.Switchbutton(true, buttonNumber);
+}

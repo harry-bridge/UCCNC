@@ -1,0 +1,11 @@
+// Rapid move the head of the laser to the top right of the machine (park position)
+
+double parkX = 1005;
+double parkY = 635;
+
+AS3.Switchbutton(true, 20005);
+
+string command = string.Format("G0 G53 G90 X{0:000} Y{1:000}", parkX, parkY);
+exec.Code(command);
+
+AS3.Switchbutton(false, 20005);

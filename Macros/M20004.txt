@@ -1,0 +1,14 @@
+// Turn on and off the extractor fan
+
+int buttonNumber = 20004;
+
+if (AS3.Getbuttonstate(buttonNumber)) {
+	// Button on so turn off
+	exec.Clroutpin(2, 9);
+	AS3.Switchbutton(false, buttonNumber);
+} else {
+	// Button off so turn on
+	exec.Setoutpin(2, 9);
+	AS3.Switchbutton(true, buttonNumber);
+}
+
